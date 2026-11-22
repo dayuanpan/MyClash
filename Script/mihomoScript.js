@@ -65,9 +65,9 @@ const ruleOptionsEnable = {
 // 定义前置规则
 const prefixRules = [
   // 新增tailscale规则
-  'DOMAIN-SUFFIX,tailscale.com,直连',
-  'DOMAIN-SUFFIX,tailscale.io,直连',
-  'DOMAIN-SUFFIX,ipn.dev,直连',
+  //'DOMAIN-SUFFIX,tailscale.com,直连',
+  //'DOMAIN-SUFFIX,tailscale.io,直连',
+  //'DOMAIN-SUFFIX,ipn.dev,直连',
   'IP-CIDR,100.64.0.0/10,家庭局域网,no-resolve',
   'IP-CIDR6,fd7a:115c:a1e0::/48,家庭局域网,no-resolve',
   'DOMAIN-SUFFIX,ts.net,家庭局域网',
