@@ -50,8 +50,8 @@ const ruleOptionsEnable = {
   极简国内外分流模式: false, // 是否启用极简国内外分流模式
   生成地区自动选择组: true, // 是否生成地区自动选择策略组
   隐藏地区手动选择组: false, // 是否隐藏地区手动选择策略组
-  生成高低倍率组: true, // 是否生成低倍率/高倍率策略组
-  生成家宽节点组: true, // 是否生成家宽（住宅/原生 IP）节点策略组
+  生成高低倍率组: false, // 是否生成低倍率/高倍率策略组
+  生成家宽节点组: false, // 是否生成家宽（住宅/原生 IP）节点策略组
   分流组添加所有节点: false, // 是否为分流策略组添加所有节点
   过滤低倍率节点: false, // 是否过滤低倍率节点
   过滤高倍率节点: false, // 是否过滤高倍率节点
@@ -64,6 +64,16 @@ const ruleOptionsEnable = {
 
 // 定义前置规则
 const prefixRules = [
+  // 新增tailscale规则
+  'DOMAIN-SUFFIX,tailscale.com,直连',
+  'DOMAIN-SUFFIX,tailscale.io,直连',
+  'DOMAIN-SUFFIX,ipn.dev,直连',
+  'IP-CIDR,100.64.0.0/10,家庭局域网,no-resolve',
+  'IP-CIDR6,fd7a:115c:a1e0::/48,家庭局域网,no-resolve',
+  'DOMAIN-SUFFIX,ts.net,家庭局域网',
+  'DOMAIN-SUFFIX,zjj-cloud.cn,家庭局域网',
+  'IP-CIDR,192.168.20.0/24,家庭局域网,no-resolve',
+  'IP-CIDR,192.168.40.0/24,家庭局域网,no-resolve'
   // 私有网络直连
   'RULE-SET,private,直连',
 
@@ -139,6 +149,21 @@ const directProxies = [
     name: '🇨🇳 直连 | 仅IPv6',
     type: 'direct',
     'ip-version': 'ipv6',
+  },
+];
+
+//新增tailscale节点
+const tailscaleProxies = [
+  {
+    name: "🛰️ Tailnet",
+    type: "tailscale",
+    hostname: "flclash-vivo",
+    // "auth-key": "tskey-auth-xxxx",
+    "state-dir": "./tailscale-flclash",
+    ephemeral: false,
+    udp: true,
+    "accept-routes": true,
+    "ip-version": "ipv4-prefer"
   },
 ];
 
@@ -356,6 +381,15 @@ const loadBalanceBaseOption = {
   'exclude-type': 'DIRECT',
   icon: `${iconBaseUrl}RoundRobin.svg`,
   hidden: true,
+};
+
+// 增加tailscale策略组
+const tailscaleGroup = {
+  ...selectBaseOption,
+  name: '家庭局域网',
+  type: 'select',
+  proxies: [...tailscaleProxies.map((p) => p.name), '直连'],
+  icon: 'https://fastly.jsdelivr.net/gh/dayuanpan/MyClash@dev/Icons/svg/tailscale.svg',
 };
 
 // 定义基础策略组
@@ -1823,6 +1857,7 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
       'rule-set:private',
       'rule-set:fakeip_filter',
       'rule-set:cn',
+      '+.zjj-cloud.cn', //增加tailscale的域名解析过滤
       ...(minimalModeEnabled ? [] : ruleOptionsEnable['FCM'] ? ['rule-set:googlefcm'] : []),
       ...proxyFakeIpFilter,
     ],
@@ -1927,10 +1962,11 @@ function main(config) {
     'auto-detect-interface': true,
     'dns-hijack': ['any:53', 'tcp://any:53'],
   };
-
-  newConfig['proxies'] = [...mappedProxies, ...customProxies, ...directProxies];
+  //总节点池加入tailscale,tailscaleGroup置顶策略组
+  newConfig['proxies'] = [...mappedProxies, ...customProxies, ...directProxies, ...tailscaleProxies];
   newConfig['proxy-groups'] = [
     globalGroup,
+    tailscaleGroup,
     ...functionalGroups,
     ...(customGroup ? [customGroup] : []),
     ...(chainGroup ? [chainGroup] : []),
