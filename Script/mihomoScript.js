@@ -73,7 +73,7 @@ const prefixRules = [
   'DOMAIN-SUFFIX,ts.net,家庭局域网',
   'DOMAIN-SUFFIX,zjj-cloud.cn,家庭局域网',
   'IP-CIDR,192.168.20.0/24,家庭局域网,no-resolve',
-  'IP-CIDR,192.168.40.0/24,家庭局域网,no-resolve'
+  'IP-CIDR,192.168.40.0/24,家庭局域网,no-resolve',
   // 私有网络直连
   'RULE-SET,private,直连',
 
