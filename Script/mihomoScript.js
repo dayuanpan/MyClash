@@ -87,6 +87,12 @@ const prefixRules = [
   'DOMAIN,fsend.cn,直连',
   'DOMAIN,international-gfe.download.nvidia.com,直连',
   'DOMAIN-SUFFIX,ctaiot.com,直连',
+
+  //运营商手机组件上报app信息拦截
+  'DOMAIN,dm.wo.com.cn,REJECT',
+  'DOMAIN,fxltsbl.com,REJECT',
+  'DOMAIN,zzhc.vnet.cn,REJECT',
+  'DOMAIN,typdm.tydevice.com,REJECT',
 ];
 
 // 此处添加自定义节点，填入下方[]内（可选，留空则不生成“自建节点”策略组）
